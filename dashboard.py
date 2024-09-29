@@ -182,7 +182,7 @@ with col1:
     colors = ['#90CAF9', '#90CAF9', '#90CAF9', '#90CAF9', '#90CAF9', '#90CAF9', '#90CAF9', '#90CAF9', '#90CAF9', '#90CAF9']
 
     sns.barplot(y='customer_id', x='recency', data=rfm_df.sort_values(by='recency', ascending=True).head(10), palette=colors, ax=ax)
-    ax.set_ylabel('customer_id', fontsize=30)
+    ax.set_ylabel(None)
     ax.set_xlabel(None)
     ax.set_title('By Recency (days)', loc='center', fontsize=50)
     ax.tick_params(axis='y', labelsize=30)
@@ -194,7 +194,7 @@ with col2:
     colors = ['#90CAF9', '#90CAF9', '#90CAF9', '#90CAF9', '#90CAF9', '#90CAF9', '#90CAF9', '#90CAF9', '#90CAF9', '#90CAF9']
 
     sns.barplot(y='customer_id', x='frequency', data=rfm_df.sort_values(by='frequency', ascending=False).head(10), palette=colors, ax=ax)
-    ax.set_ylabel('customer_id', fontsize=30)
+    ax.set_ylabel(None)
     ax.set_xlabel(None)
     ax.set_title('By Frequency', loc='center', fontsize=50)
     ax.tick_params(axis='y', labelsize=30)
@@ -205,7 +205,7 @@ fig, ax = plt.subplots(figsize=(20, 10))
 colors = ['#90CAF9', '#90CAF9', '#90CAF9', '#90CAF9', '#90CAF9', '#90CAF9', '#90CAF9', '#90CAF9', '#90CAF9', '#90CAF9']
 
 sns.barplot(y='customer_id', x='monetary', data=rfm_df.sort_values(by='monetary', ascending=False).head(10), palette=colors, ax=ax)
-ax.set_ylabel('customer_id', fontsize=30)
+ax.set_ylabel(None)
 ax.set_xlabel(None)
 ax.set_title('By Monetary', loc='center', fontsize=50)
 ax.tick_params(axis='y', labelsize=30)
