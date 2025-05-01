@@ -121,7 +121,8 @@ rfm_df = create_rfm_df(main_df)
 
 
 # Plot delivered orders
-st.header("Azhar E-Commerce Dashboard 2.0")
+st.markdown("<h1 style='text-align: center;'>Azhar E-Commerce Dashboard 2.0</h1>", unsafe_allow_html=True)
+
 st.subheader("Delivered Orders")
 
 col1, col2 = st.columns(2)
