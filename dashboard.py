@@ -4,10 +4,10 @@ import seaborn as sns
 import streamlit as st
 from babel.numbers import format_currency
 
-# Mengatur Icon pada tab browser
+# Set icon on browser tab
 st.set_page_config(page_title="E-Commerce Dashboard", page_icon=":material/bar_chart_4_bars:")
 
-# Mengatur style tampilan halaman
+# Set page style
 st.markdown("""
     <style>
         .block-container {
@@ -33,7 +33,7 @@ def create_orders_df(df):
         "price": "revenue"
     }, inplace=True)
     
-    # Hapus outlier yang belebihi batas atas karena data ada yang outlier
+    # Remove outliers above the upper bound because there are outliers in the data
     q1 = orders_df["order_count"].quantile(0.25)
     q3 = orders_df["order_count"].quantile(0.75)
     iqr = q3 - q1
@@ -74,7 +74,7 @@ def create_bycity_df(df):
 
 def create_rfm_df(df):
     rfm_df = df.groupby(by="customer_id", as_index=False).agg({
-        "order_purchase_timestamp": "max", #mengambil tanggal order terakhir
+        "order_purchase_timestamp": "max", # take the last order date
         "order_id": "nunique",
         "price": "sum"
     })
@@ -102,9 +102,9 @@ min_date = all_df["order_purchase_timestamp"].min()
 max_date = all_df["order_purchase_timestamp"].max()
 
 with st.sidebar:
-    # Mengambil start_date & end_date dari date_input
+    # Get start_date & end_date from date_input
     start_date, end_date = st.date_input(
-        label="Rentang Waktu",min_value=min_date,
+        label="Date Range",min_value=min_date,
         max_value=max_date,
         value=[min_date, max_date]
     )
@@ -112,7 +112,7 @@ with st.sidebar:
 main_df = all_df[(all_df["order_purchase_timestamp"] >= str(start_date)) & 
                 (all_df["order_purchase_timestamp"] <= str(end_date))]
 
-# # Menyiapkan berbagai dataframe
+# # Prepare various dataframes
 orders_df = create_orders_df(main_df)
 bypayment_type_df = create_bypayment_type_df(main_df)
 bystate_df = create_bystate_df(main_df)
@@ -121,8 +121,7 @@ rfm_df = create_rfm_df(main_df)
 
 
 # Plot delivered orders
-st.markdown("<h1 style='text-align: center;'>Azhar E-Commerce Dashboard 2.0</h1>", unsafe_allow_html=True)
-
+st.markdown("<h1 style='text-align: center;'>E-Commerce Dashboard</h1>", unsafe_allow_html=True)
 st.subheader("Delivered Orders")
 
 col1, col2 = st.columns(2)
@@ -135,7 +134,7 @@ with col2:
     total_revenue = format_currency(orders_df.revenue.sum(), "BRL", locale="es_CO") 
     st.metric("Total Revenue", value=total_revenue)
 
-fig, ax = plt.subplots(figsize=(16, 8))
+fig, ax = plt.subplots(figsize=(16, 6))
 ax.plot(
     orders_df["order_purchase_timestamp"],
     orders_df["order_count"],
@@ -149,18 +148,29 @@ ax.tick_params(axis="x", labelsize=15)
 st.pyplot(fig)
 
 # Plot Delivery Time
-st.subheader("Delivery Time Peformance")
+st.subheader("Delivery Time Performance")
 
-fig, ax = plt.subplots(figsize=(10, 5))
-ax.bar(['Maximum', 'Average', 'Minimum'], 
-    [main_df['delivery_time_day'].max(), 
-     main_df['delivery_time_day'].mean(), 
-     main_df['delivery_time_day'].min()], 
-    color=['tab:blue', 'tab:orange', 'tab:green'])
+fig, ax = plt.subplots(figsize=(16, 6))
+values = [
+    main_df['delivery_time_day'].max(),
+    main_df['delivery_time_day'].mean(),
+    main_df['delivery_time_day'].min()
+]
+labels = ['Maximum', 'Average', 'Minimum']
+bars = ax.bar(labels, values, color=['tab:blue', 'tab:orange', 'tab:green'])
 ax.set_title('Delivery Time (Days)', loc='center', fontsize=20)
 ax.tick_params(axis='x', labelsize=10, rotation=0)
 ax.tick_params(axis='y', labelsize=10)
+ax.set_ylim(0, 250)
 ax.grid(True, linestyle='--', alpha=0.7)
+
+for bar in bars:
+    height = bar.get_height()
+    ax.annotate(f'{height:.2f}',
+                xy=(bar.get_x() + bar.get_width() / 2, height),
+                xytext=(0, 3),
+                textcoords="offset points",
+                ha='center', va='bottom', fontsize=10, fontweight='bold')
 st.pyplot(fig)
 
 # Plot customer details
@@ -203,7 +213,7 @@ with col2:
     st.pyplot(fig)
 
 
-# Menampilkan metode pembayaran yang paling banyak digunakan dalam bentuk pie chart
+# Show the most used payment methods in a pie chart
 bypayment_type_df.loc[bypayment_type_df["payment_type"].isin(["debit_card", "voucher"]), "payment_type"] = "debit_card & voucher"
 bypayment_type_df = bypayment_type_df.groupby("payment_type", as_index=False).sum()
 bypayment_type_df.sort_values(by="customer_count", ascending=False, inplace=True)
@@ -211,16 +221,30 @@ bypayment_type_df.sort_values(by="customer_count", ascending=False, inplace=True
 fig, ax = plt.subplots(figsize=(4, 4))
 colors_ = ["tab:blue", "tab:orange", "tab:green", "tab:red"]
 
-ax.pie(
+wedges, texts, autotexts = ax.pie(
     bypayment_type_df["customer_count"],
-    labels=bypayment_type_df["payment_type"],
+    labels=None,
     autopct=lambda p: f"{p:.1f}%\n({int(p * sum(bypayment_type_df['customer_count']) / 100)})",
     colors=colors_[:len(bypayment_type_df)],
     startangle=45,
-    textprops={"fontsize": 9},
-    radius=0.8
+    textprops={"fontsize": 6},
+    radius=1.0
 )
-ax.set_title("Number of Customer by Payment Type", fontsize=9)
+ax.set_title("Number of Customer by Payment Type", fontsize=6)
+
+# Add tight and neat legend
+ax.legend(
+    wedges,
+    bypayment_type_df["payment_type"],
+    title="Payment Type",
+    loc="center left",
+    bbox_to_anchor=(1, 0.5),
+    fontsize=6,
+    title_fontsize=6,
+    frameon=False
+)
+
+fig.tight_layout()
 st.pyplot(fig)
 
 # Best Customer Based on RFM Parameters
