@@ -296,9 +296,10 @@ colors = ["tab:blue", "tab:blue", "tab:blue", "tab:blue", "tab:blue", "tab:blue"
 sns.barplot(y="customer_id", x="monetary", data=rfm_df.sort_values(by="monetary", ascending=False).head(10), palette=colors, ax=ax)
 ax.set_ylabel(None)
 ax.set_xlabel(None)
-ax.set_title("By Monetary", loc="center", fontsize=50)
+ax.set_title("By Monetary", loc="center", fontsize=30)
 ax.tick_params(axis="y", labelsize=30)
 ax.tick_params(axis="x", labelsize=35)
 st.pyplot(fig)
 
 st.caption("Copyright © Azhar Anas 2025")
+
